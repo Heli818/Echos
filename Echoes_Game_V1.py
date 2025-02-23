@@ -1,7 +1,6 @@
 import pygame
 import random
 import sys
-import math
 from enum import Enum
 import time
 
@@ -13,13 +12,6 @@ SCREEN_HEIGHT = 768
 GRID_SIZE = 12
 ROOM_SIZE = 64
 FPS = 60
-SANITY_DRAIN_RATE = 0.05
-ENTITY_SPAWN_CHANCE = 0.015
-SANITY_THRESHOLD_MED = 50
-SANITY_THRESHOLD_LOW = 25
-FLASHLIGHT_BATTERY_MAX = 100
-FLASHLIGHT_DRAIN_RATE = 0.2
-FLASHLIGHT_RECHARGE_RATE = 0.5
 
 # Colors
 WHITE = (255, 255, 255)
@@ -45,6 +37,13 @@ class GameState(Enum):
     PAUSED = 1
     GAME_OVER = 2
     VICTORY = 3
+
+class DialogueManager:
+    def __init__(self):
+        self.conversations = {}
+
+    def add_conversation(self, spirit, conversation):
+        self.conversations[spirit] = conversation
 
 class AudioManager:
     def __init__(self):
@@ -116,20 +115,11 @@ class Game:
                 self.state = GameState.GAME_OVER
             elif event.type == pygame.KEYDOWN:
                 if self.state == GameState.PLAYING:
-                    if event.key == pygame.K_UP:
-                        self.player.move('north')
-                    elif event.key == pygame.K_DOWN:
-                        self.player.move('south')
-                    elif event.key == pygame.K_LEFT:
-                        self.player.move('west')
-                    elif event.key == pygame.K_RIGHT:
-                        self.player.move('east')
-                    elif event.key == pygame.K_SPACE:
-                        self.player.interact()
-                    elif event.key == pygame.K_f:
-                        self.player.toggle_flashlight()
-                    elif event.key == pygame.K_h:
-                        self.player.toggle_hiding()
+                if self.state == GameState.PLAYING:
+                if self.state == GameState.PLAYING:
+                if self.state == GameState.PLAYING:
+                if self.state == GameState.PLAYING:
+
                 if event.key == pygame.K_p:
                     self.state = GameState.PAUSED if self.state == GameState.PLAYING else GameState.PLAYING
 
@@ -137,13 +127,7 @@ class Game:
         self.player.update()
         self.house.update()
         self.story.update()
-        self.entities_near = any(room.entities for row in self.house.grid for room in row 
-                                if abs(room.x - self.player.x) <= 2 and abs(room.y - self.player.y) <= 2)
-        self.audio.update_ambient(self.player.sanity, self.entities_near)
         
-        if self.player.sanity <= 0:
-            self.message = "The shadows have claimed your mind. You are lost forever."
-            self.state = GameState.GAME_OVER
         elif self.story.all_spirits_helped():
             self.message = "All spirits are at peace. The house releases its grip. You escape."
             self.state = GameState.VICTORY
